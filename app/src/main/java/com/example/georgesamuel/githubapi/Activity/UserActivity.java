@@ -1,19 +1,28 @@
 package com.example.georgesamuel.githubapi.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.georgesamuel.githubapi.R;
 import com.example.georgesamuel.githubapi.model.GitHubUser;
-import com.example.georgesamuel.githubapi.model.ImageDownloader;
+import com.example.georgesamuel.githubapi.rest.ImageDownloader;
 import com.example.georgesamuel.githubapi.rest.ApiClient;
 import com.example.georgesamuel.githubapi.rest.GitHubUserEndPoints;
+import com.example.georgesamuel.githubapi.rest.SharedPreferenceConfig;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,6 +36,7 @@ public class UserActivity extends AppCompatActivity {
     private Bundle extras;
     private String newString;
     Bitmap myImg;
+    private SharedPreferenceConfig sharedPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +51,31 @@ public class UserActivity extends AppCompatActivity {
         email = (TextView) findViewById(R.id.email);
         ownedrepos = (Button) findViewById(R.id.ownedReposBtn);
 
-        extras = getIntent().getExtras();
-        newString = extras.getString("STRING_I_NEED");
-        newString = newString.trim();
-
+        sharedPreference = new SharedPreferenceConfig(getApplicationContext());
+        newString = sharedPreference.getSharedPreferences().second;
+        Log.v("newString", "user " + newString);
         loadData();
 
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.logout)
+        {
+            sharedPreference.setSharedPreferences(false, "Not Found");
+            Intent i = new Intent(UserActivity.this, MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void loadData() {
@@ -91,7 +120,17 @@ public class UserActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<GitHubUser> call, Throwable t) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this);
+                builder.setTitle("Error");
+                builder.setMessage(t.toString());
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
+                    }
+                });
+
+                builder.create().show();
             }
         });
     }
@@ -101,4 +140,5 @@ public class UserActivity extends AppCompatActivity {
         i.putExtra("username", newString);
         startActivity(i);
     }
+
 }

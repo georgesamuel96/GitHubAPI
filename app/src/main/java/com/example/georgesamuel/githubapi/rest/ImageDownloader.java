@@ -1,4 +1,4 @@
-package com.example.georgesamuel.githubapi.model;
+package com.example.georgesamuel.githubapi.rest;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
