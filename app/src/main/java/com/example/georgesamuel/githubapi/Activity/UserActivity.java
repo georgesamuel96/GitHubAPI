@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ public class UserActivity extends AppCompatActivity {
     private String newString;
     Bitmap myImg;
     private SharedPreferenceConfig sharedPreference;
+    private ConnectivityManager connectivityManager;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +54,14 @@ public class UserActivity extends AppCompatActivity {
         login = (TextView) findViewById(R.id.login);
         email = (TextView) findViewById(R.id.email);
         ownedrepos = (Button) findViewById(R.id.ownedReposBtn);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         sharedPreference = new SharedPreferenceConfig(getApplicationContext());
         newString = sharedPreference.getSharedPreferences().second;
         Log.v("newString", "user " + newString);
         loadData();
-
 
     }
 
@@ -120,17 +126,8 @@ public class UserActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<GitHubUser> call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this);
-                builder.setTitle("Error");
-                builder.setMessage(t.toString());
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                builder.create().show();
+                if(!checkNetworkStatus())
+                    informUser("No internet connection available...");
             }
         });
     }
@@ -139,6 +136,24 @@ public class UserActivity extends AppCompatActivity {
         Intent i = new Intent(UserActivity.this, Repositories.class);
         i.putExtra("username", newString);
         startActivity(i);
+    }
+
+    private void informUser(String message)
+    {
+        Snackbar.make(linearLayout, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private boolean checkNetworkStatus()
+    {
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }

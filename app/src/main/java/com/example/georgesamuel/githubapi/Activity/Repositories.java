@@ -65,7 +65,7 @@ public class Repositories extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<GitHubRepo>> call, Throwable t) {
-                Toast.makeText(Repositories.this, t.toString(), Toast.LENGTH_SHORT).show();
+
             }
         });
     }
