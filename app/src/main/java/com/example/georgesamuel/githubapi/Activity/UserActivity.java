@@ -1,5 +1,6 @@
 package com.example.georgesamuel.githubapi.Activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,8 +25,11 @@ import com.example.georgesamuel.githubapi.model.GitHubUser;
 import com.example.georgesamuel.githubapi.rest.ImageDownloader;
 import com.example.georgesamuel.githubapi.rest.ApiClient;
 import com.example.georgesamuel.githubapi.rest.GitHubUserEndPoints;
+import com.example.georgesamuel.githubapi.rest.LocaleHelper;
+import com.example.georgesamuel.githubapi.rest.ResetView;
 import com.example.georgesamuel.githubapi.rest.SharedPreferenceConfig;
 
+import io.paperdb.Paper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,11 +45,25 @@ public class UserActivity extends AppCompatActivity {
     private SharedPreferenceConfig sharedPreference;
     private ConnectivityManager connectivityManager;
     private LinearLayout linearLayout;
+    private ResetView resetView;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+
+        resetView = new ResetView(getApplicationContext());
+        Paper.init(this);
+        String language = Paper.book().read("language");
+        if(language == null){
+            Paper.book().write("language", "en");
+        }
+        resetView.updateView((String) Paper.book().read("language"));
 
         avatarImg = (ImageView) findViewById(R.id.avatar);
         userNameTV = (TextView) findViewById(R.id.username);
@@ -81,6 +99,12 @@ public class UserActivity extends AppCompatActivity {
             startActivity(i);
             finish();
         }
+        else if(id == R.id.language)
+        {
+            resetView.updatePreferences();
+            finish();
+            startActivity(getIntent());
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -93,16 +117,16 @@ public class UserActivity extends AppCompatActivity {
             public void onResponse(Call<GitHubUser> call, Response<GitHubUser> response) {
                 GitHubUser user = response.body();
                 if(user.getName() == null)
-                    userNameTV.setText("No name provided");
+                    userNameTV.setText(getText(R.string.no_name));
                 else
-                    userNameTV.setText("Username: " + user.getName());
-                followersTV.setText("Followers: " + user.getFollowers());
-                followingTV.setText("Following: " + user.getFollowing());
-                login.setText("LogIn: " + user.getLogin());
+                    userNameTV.setText(getText(R.string.user_name) + ": " + user.getName());
+                followersTV.setText(getText(R.string.followers) + ": " + user.getFollowers());
+                followingTV.setText(getText(R.string.following) + ": " + user.getFollowing());
+                login.setText(getText(R.string.login) + ": " + user.getLogin());
                 if(user.getEmail() == null)
-                    email.setText("No email provided");
+                    email.setText(getText(R.string.not_email));
                 else
-                    email.setText("Email: " + user.getEmail());
+                    email.setText(getText(R.string.email) + ": " + user.getEmail());
 
                 /*RequestOptions option;
                 option = new RequestOptions().centerCrop().placeholder(R.drawable.loading_shape).error(R.drawable.loading_shape);

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="text"
-        android:hint="User Name"/>
+        android:hint="@string/user_name"/>
 
     <Button
         android:id="@+id/btn_login"
@@ -24,7 +24,7 @@
         android:layout_marginBottom="20dp"
         android:padding="15dp"
         android:layout_below="@id/input_username"
-        android:text="Login"
+        android:text="@string/login"
         android:onClick="getUser"/>
 
 </RelativeLayout>

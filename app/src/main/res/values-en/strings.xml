@@ -3,7 +3,7 @@
 
     <string name="login_preference">com.example.georgesamuel.githubapi_login_preference</string>
     <string name="login_status_preference">com.example.georgesamuel.githubapi_login_status_preference</string>
-    <string name="language">English</string>
+    <string name="language">عربى</string>
     <string name="user_name">User Name</string>
     <string name="login">Login</string>
     <string name="username_error">Please enter username</string>
